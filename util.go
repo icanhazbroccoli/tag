@@ -41,6 +41,14 @@ func readUint64LittleEndian(r io.Reader) (uint64, error) {
 	return binary.LittleEndian.Uint64(b), nil
 }
 
+func readUint64BigEndian(r io.Reader) (uint64, error) {
+	b, err := readBytes(r, 8)
+	if err != nil {
+		return 0, err
+	}
+	return binary.BigEndian.Uint64(b), nil
+}
+
 // readBytesMaxUpfront is the max up-front allocation allowed
 const readBytesMaxUpfront = 10 << 20 // 10MB
 
@@ -99,4 +107,12 @@ func readUint32LittleEndian(r io.Reader) (uint32, error) {
 		return 0, err
 	}
 	return binary.LittleEndian.Uint32(b), nil
+}
+
+func readUint32BigEndian(r io.Reader) (uint32, error) {
+	b, err := readBytes(r, 4)
+	if err != nil {
+		return 0, err
+	}
+	return binary.BigEndian.Uint32(b), nil
 }

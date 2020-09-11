@@ -98,6 +98,8 @@ func (m metadataMP4) readAtoms(r io.ReadSeeker) error {
 
 		case "moov", "udta", "ilst":
 			return m.readAtoms(r)
+		case "mvhd":
+			return m.readMvhd(r, size)
 		}
 
 		_, ok := atoms[name]
@@ -127,6 +129,51 @@ func (m metadataMP4) readAtoms(r io.ReadSeeker) error {
 			return err
 		}
 	}
+}
+
+func (m metadataMP4) readMvhd(r io.ReadSeeker, size uint32) error {
+	version, err := readUint(r, 1)
+	if err != nil {
+		return err
+	}
+	if _, err := readBytes(r, 3); err != nil {
+		return err
+	}
+	var scale uint32
+	var duration float64
+	switch version {
+	case 0:
+		if _, err := readBytes(r, 8); err != nil {
+			return err
+		}
+		scale, err = readUint32BigEndian(r)
+		if err != nil {
+			return err
+		}
+		d, err := readUint32BigEndian(r)
+		if err != nil {
+			return err
+		}
+		duration = float64(d) / float64(scale)
+	case 1:
+		if _, err := readBytes(r, 16); err != nil {
+			return err
+		}
+		scale, err := readUint32BigEndian(r)
+		if err != nil {
+			return err
+		}
+		d, err := readUint64BigEndian(r)
+		if err != nil {
+			return err
+		}
+		duration = float64(d) / float64(scale)
+	default:
+		return fmt.Errorf("Unknown mp4 version: %d", version)
+	}
+	m.data["scale"] = scale
+	m.data["duration"] = duration
+	return nil
 }
 
 func (m metadataMP4) readAtomData(r io.ReadSeeker, name string, size uint32, processedData []string) error {

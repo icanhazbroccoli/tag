@@ -13,8 +13,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/dhowden/tag"
-	"github.com/dhowden/tag/mbz"
+	"github.com/icanhazbroccoli/tag"
+	"github.com/icanhazbroccoli/tag/mbz"
 )
 
 var usage = func() {
