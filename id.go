@@ -58,24 +58,6 @@ func Identify(r io.ReadSeeker) (format Format, fileType FileType, err error) {
 		return format, MP3, nil
 	}
 
-	n, err := r.Seek(-128, io.SeekEnd)
-	if err != nil {
-		return
-	}
-
-	tag, err := readString(r, 3)
-	if err != nil {
-		return
-	}
-
-	_, err = r.Seek(-n, io.SeekCurrent)
-	if err != nil {
-		return
-	}
-
-	if tag != "TAG" {
-		err = ErrNoTagsFound
-		return
-	}
-	return ID3v1, MP3, nil
+	err = ErrNoTagsFound
+	return
 }
